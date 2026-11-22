@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "numpy>=2.0",
+    "pyyaml>=6.0",
+    "tomli-w>=1.0",
     "torch>=2.5",
 ]
 
@@ -13,7 +15,6 @@ dependencies = [
 dev = [
     "pre-commit>=3.7",
     "pytest>=8.0",
-    "pyyaml>=6.0",
     "ruff>=0.6",
     "ty>=0.0.107",
 ]
@@ -28,7 +29,7 @@ packages = ["src/project_name"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["src", "tests"]
+src = ["src", "tests", "scripts"]
 extend-exclude = ["tools"]
 
 [tool.ruff.lint]
@@ -40,7 +41,7 @@ ignore = ["RUF001", "RUF002", "RUF003"]
 python-version = "3.12"
 
 [tool.ty.src]
-include = ["src", "tests"]
+include = ["src", "tests", "scripts"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

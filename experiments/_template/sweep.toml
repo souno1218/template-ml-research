@@ -1,0 +1,4 @@
+# {{id}} で回す案と seed。uv run scripts/sweep.py experiments/{{stem}}/sweep.toml
+variants = ["baseline"]
+seeds = [0]
+parallel = 1  # 同時に回す本数

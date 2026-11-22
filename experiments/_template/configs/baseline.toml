@@ -1,0 +1,6 @@
+# 基準線。案の設定は、これを inherit して違うところだけを書く。
+inherit = "../../../configs/base/example.toml"
+
+[run]
+# 試作のコードを使うときは、施策の code/ をプラグインとして読み込む
+# plugins = ["experiments/Exxxx-<slug>/code"]
