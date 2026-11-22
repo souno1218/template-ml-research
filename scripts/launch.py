@@ -10,6 +10,10 @@ AI が渡すのは次の 1 行だけ (ブランチ・commit・施策 ID を埋�
 端末を閉じても計算は続く。タスクは sweep.py → collect.py → (--publish なら) publish.py
 → 結果の commit と push を順に行う。様子は `pueue status`、`pueue follow <id>`、
 `uv run scripts/progress.py E0001 --watch 60` で見る。pueue がなければ入れ方を表示して止まる。
+
+Mac では、タスクが動いている間だけ caffeinate でスリープを止める
+(pueue・--detach・--foreground のどれでも)。
+ふたを閉じると止まることがあるので、ふたは開けたままにする。
 """
 
 from __future__ import annotations
@@ -17,6 +21,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import shlex
 import shutil
 import socket
@@ -40,8 +45,26 @@ def write_status(path: Path, **fields: object) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1))
 
 
+def keep_awake(platform: str = sys.platform, which=shutil.which, popen=subprocess.Popen) -> bool:
+    """Mac なら、このプロセスが終わるまでスリープを止める caffeinate を裏で起動する。
+
+    起動したら True。
+
+    -i (アイドルでのスリープ)、-m (ディスク)、-s (電源につないでいるときのシステムの
+    スリープ) を止める。
+    -w でこのプロセスの終了を待つので、計算が終われば caffeinate も終わる。
+    """
+    if platform != "darwin" or which("caffeinate") is None:
+        return False
+    popen(["caffeinate", "-ims", "-w", str(os.getpid())])
+    return True
+
+
 def child(args: argparse.Namespace, root: Path, status: Path) -> int:
     """裏で動く本体。各段階の結果を status に書き、失敗したらそこで止める (push しない)。"""
+    if keep_awake():
+        msg = "Mac: 計算が終わるまで caffeinate でスリープを止める (ふたは開けたままにする)"
+        print(msg, flush=True)
     stem = exp_dir(root, find(root, args.experiment)).name
     sweep = Path(args.sweep) if args.sweep else root / "experiments" / stem / "sweep.toml"
     py, here = sys.executable, Path(__file__).resolve().parent
