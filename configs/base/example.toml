@@ -1,0 +1,22 @@
+# 仕組みを確かめるための例 (src/project_name/jobs.py の example)。実際の研究の基準線に置き換える。
+
+[run]
+job = "example"
+device = "cpu"         # "auto" なら cuda -> mps -> cpu
+deterministic = true   # 決定的な実装だけを使う (docs/rules/running.md)
+publish = []           # GitHub Releases に保管するファイル (例: ["model.pt"])
+
+[data]
+data_seed = 0
+n_train = 256
+n_test = 64
+d_in = 4
+noise = 0.1
+
+[train]
+steps = 200
+lr = 0.05
+
+[eval]
+ok_threshold = 0.05
+# suite = "v1"         # 評価一式を使うときは版を書く。run.py が照合し、版とハッシュを記録する

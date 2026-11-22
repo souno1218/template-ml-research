@@ -1,3 +1,6 @@
 # Decision
 
-* [OKF を知識ドキュメントの標準にする](adopt-okf.md) - 知識ドキュメントを Open Knowledge Format v0.3 で書く判断。
+`uv run scripts/index.py` が作る (手で編集しない)。
+
+* [OKF を知識ドキュメントの標準にする](adopt-okf.md) - 知識ドキュメントを Open Knowledge Format v0.3 のバンドルとして .okf/ に置く判断。
+* [AI 駆動研究の汎用の枠組みを入れる](adopt-research-framework.md) - execSR で育てた施策の流れ・評価の凍結・実行の強制・hooks を、PyTorch の研究に共通の枠組みとしてテンプレートに入れ、Question と Status の type を足す判断。
