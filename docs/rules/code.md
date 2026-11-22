@@ -9,7 +9,7 @@ src/project_name/
   eval/         評価コード。施策のコードから分けて置く
   lab/          研究の道具 (Proposal の検査と索引、実行の記録、git の確認、評価一式の照合、集計)
   utils.py      デバイス選択と seed 固定
-scripts/        実行の入口 (run、sweep、collect、publish、fetch、new_experiment、index、progress)
+scripts/        実行の入口 (run、sweep、launch、collect、publish、fetch、new_experiment、index、progress)
 scripts/hooks/  Claude Code の hooks (.claude/settings.json から呼ぶ)
 configs/        基準線などの共通の設定
 bench/suites/   評価一式 (版ごと)

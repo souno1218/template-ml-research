@@ -79,7 +79,7 @@ def main() -> int:
             out = out_dir / f"{time.strftime('%Y%m%d-%H%M%S')}-{exp_id}-{v}-s{s}.out"
             cmd = [
                 sys.executable,
-                str(root / "scripts" / "run.py"),
+                str(Path(__file__).resolve().parent / "run.py"),
                 "--config",
                 str(cfg),
                 "--experiment",
