@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+.venv/
+.ruff_cache/
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+.DS_Store
+.env
+
+# 機械学習の出力（成果物は GitHub Releases に置く）
+outputs/
+checkpoints/
+runs/
+wandb/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+data/
