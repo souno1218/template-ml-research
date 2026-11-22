@@ -1,28 +1,38 @@
 ---
 type: Proposal
-title: <施策名>
+title: $title
 description: <この施策で何を試し、何を確かめるかを1文で。>
-tags: [<tag>]
+tags: [$kind]
 status: draft
-generated: { by: "claude/<model>", at: "<YYYY-MM-DDTHH:MM:SSZ>" }
+x-id: $id
+x-kind: $kind
+x-phase: proposed
+x-question: "$question"
+x-branch: $branch
+x-rules-version: $rules_version
+x-suite: "<評価一式の版。infra は ->"
+x-baseline: "<基準線の設定。なければ ->"
+x-variants: [<案の名前>]
+x-tier: smoke
+generated: { by: "claude/<model>", at: "$now" }
 ---
 
-# 目的
+# 仮説と根拠
 
-<何を明らかにしたいか。現状の何が問題か。>
+<何が起きると考えるか。根拠にした過去の結果（Experiment へのリンクなど）を引く。>
 
-# 方法
+# 変えること
 
-<何をどう変えるか。ブランチ名。>
+<基準線から変えるのは何か。案が複数あるときは案ごとに。>
 
-# 評価
+# 合格の基準
 
-<使う評価（[Architecture](../architecture/<eval>.md) など）、比較対象、採用の基準。評価を変える場合は先に Decision を書く。>
+<どの評価モードのどの指標が、どれだけ変われば、次の段階に進むか・採用するか。後から緩めない。>
 
-# 中止の条件
+# 予算
 
-<途中で止める条件。>
+<段階と、見込みの計算時間とマシン。>
 
 # 承認
 
-承認待ち。承認後は status を stable にし、結果を [Experiment](../experiments/<name>.md)、判定を [Decision](../decisions/<name>.md) に書く。
+承認待ち。承認後は `x-phase: approved`、`status: stable` にする。結果は `.okf/experiments/$id-$slug.md`、判定は `.okf/decisions/` に書く（まだ存在しないので、リンクにしない）。

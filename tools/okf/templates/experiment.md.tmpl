@@ -1,46 +1,42 @@
 ---
 type: Experiment
-title: <実験名>
+title: "$id: <実験名>"
 description: <何を比べ、何が分かったかを1文で。>
 tags: [<tag>]
+resource: /experiments/$id-$slug/
 generated: { by: "claude/<model>", at: "<YYYY-MM-DDTHH:MM:SSZ>" }
 sources:
-  - id: <run>
-    resource: <結果ファイル・ログ・Release の URL または /path>
-    title: <結果の名前>
+  - id: run
+    resource: /experiments/$id-$slug/results/summary.md
+    title: $id の実行結果
 ---
 
 # 対応する提案
 
-[Proposal](../proposals/<name>.md)
+[Proposal](../proposals/$id-$slug.md)
 
 # 実行情報
 
-`collect_run_info()` の出力をそのまま貼る。dirty が true の結果は採用の根拠にしない。[^<run>]
+`collect.py` が集めた `meta.json` の内容を貼る。dirty が true の結果は採用の根拠にしない。[^run]
 
-| 項目 | 値 |
-|---|---|
-| commit | <hash> |
-| branch | <branch> |
-| dirty | <false> |
-| seed | <seed> |
-| device | <cuda / mps / cpu> |
-| host | <host> |
-| torch | <version> |
-| at | <YYYY-MM-DDTHH:MM:SSZ> |
-
-# 設定
-
-<設定ファイルのパス、主なハイパーパラメータ、データ。>
+| 案 | seed | commit | dirty | device | host | 終了コード |
+|---|---|---|---|---|---|---|
+| <案> | <seed> | <hash> | <false> | <cuda / mps / cpu> | <host> | 0 |
 
 # 結果
 
-| 条件 | 指標 | 値 |
-|---|---|---|
-| <条件> | <指標> | <値> |
+| 案 | 指標 | 値 | 区間 |
+|---|---|---|---|
+| <案> | <指標> | <値> | <95% 区間> |
 
 # 考察
 
 <結果から言えること。言えないこと。次にやること。>
 
-[^<run>]: <結果の名前>
+# 判定の案
+
+| 案 | 判定 (adopted / rejected / parked) | 理由 |
+|---|---|---|
+| <案> | <判定> | <理由> |
+
+[^run]: $id の実行結果

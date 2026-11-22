@@ -3,23 +3,24 @@
 import platform
 import subprocess
 from datetime import UTC, datetime
+from pathlib import Path
 
 import torch
 
 from project_name.utils import get_device
 
 
-def _git(*args: str) -> str:
-    result = subprocess.run(["git", *args], capture_output=True, text=True, check=False)
+def _git(cwd: Path | None, *args: str) -> str:
+    result = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=False)
     return result.stdout.strip() if result.returncode == 0 else "unknown"
 
 
-def collect_run_info(seed: int) -> dict[str, str | int | bool]:
-    """コミット・未コミット変更の有無・seed・デバイス・環境を辞書で返す。"""
+def collect_run_info(seed: int, cwd: Path | None = None) -> dict[str, str | int | bool]:
+    """コミット・dirty の有無・seed・デバイス・環境を辞書で返す。cwd は git のリポジトリ。"""
     return {
-        "commit": _git("rev-parse", "HEAD"),
-        "branch": _git("rev-parse", "--abbrev-ref", "HEAD"),
-        "dirty": _git("status", "--porcelain") != "",
+        "commit": _git(cwd, "rev-parse", "HEAD"),
+        "branch": _git(cwd, "rev-parse", "--abbrev-ref", "HEAD"),
+        "dirty": _git(cwd, "status", "--porcelain") != "",
         "seed": seed,
         "device": str(get_device()),
         "host": platform.node(),

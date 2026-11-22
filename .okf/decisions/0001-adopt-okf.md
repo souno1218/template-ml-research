@@ -22,7 +22,8 @@ sources:
 
 # 運用
 
-- `type` は Proposal / Decision / Experiment / Architecture / Reference を標準にする。
+- `type` は Proposal / Decision / Experiment / Architecture / Reference を標準にする。書き方は `docs/rules/okf.md`。
+- コードや結果は `experiments/Exxxx-*/` に置き、`.okf/` には知識の文書だけを入れる。
 - 変更は `tools/okf/validate.py --strict` を通す（pre-commit と CI で実行）。
 - 人間の確認を `verified` に記録するのは、本人が id を明示したときだけにする。
 
