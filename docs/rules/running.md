@@ -35,7 +35,7 @@ run_id は `<日付時刻>-<施策ID>-<案>-s<seed>` (例: `20261116-213000-E000
 | マシン | 誰が回すか | 流れ |
 |---|---|---|
 | AI が直接使えるマシン | AI | ブランチに push → その commit のまま実行 → `collect.py` → 結果を commit・push |
-| 人間の GPU マシン | 人間が手で | AI がブランチに push し、下の形のコマンドを渡す → 人間が tmux に貼り付けて実行 → 最後の数行で結果を push → AI が pull して Experiment を書く |
+| 人間の GPU マシン | 人間が 1 行を貼る | AI がブランチに push し、下の形の 1 行を渡す → 人間が端末に貼る (pueue のタスクとして裏で進み、終わると集計して結果を push する) → AI が pull して Experiment を書く |
 
 - 同じ施策の中で比べる数字は、同じ種類のマシンで出したものに限る。
 - 長い計算 (目安 1 時間以上) を始めたら、`.okf/status.md` の「実行中の計算」に、マシン・コマンド・開始時刻・終わる見込みを書く。
@@ -44,25 +44,34 @@ run_id は `<日付時刻>-<施策ID>-<案>-s<seed>` (例: `20261116-213000-E000
 
 ### 人間に渡すコマンドの形
 
-AI は、ブランチ名・commit・施策 ID をすべて埋めた状態で渡す。人間は上から順に貼り付けるだけで動くこと。
+長い計算は [pueue](https://github.com/Nukesor/pueue) のタスクとして回す。pueue は Mac・Linux (WSL)・Windows で動き、
+画面を乗っ取らないので、コピペも矢印キーの履歴も普通の端末のまま使える。端末を閉じても計算は続き、複数の計算は順番待ちになる。
+
+AI は、ブランチ名・commit・施策 ID をすべて埋めた **1 行** を渡す。人間は端末に貼るだけでよい。
 
 ```bash
-# 1. tmux の中で動かす (接続が切れても計算が続く。抜けるのは Ctrl-b d、戻るのは tmux attach -t E0001)
-tmux new -s E0001
-
-# 2. 指定の commit に合わせる
-cd ~/<repo> && git fetch origin && git switch exp/E0001-larger-lr && git pull --ff-only
-test "$(git rev-parse --short HEAD)" = "abc1234" && echo "OK: commit 一致" || echo "NG: commit が違う。ここで止めて AI に伝える"
-uv sync
-
-# 3. 実行
-uv run scripts/sweep.py experiments/E0001-larger-lr/sweep.toml
-
-# 4. 終わったら: 集計・モデルの保管・結果の push
-uv run scripts/collect.py E0001
-uv run scripts/publish.py E0001
-git add experiments/E0001-larger-lr && git commit -m "E0001: <マシン> の結果" && git push
+cd ~/<repo> && git fetch -q origin && git switch -q exp/E0001-larger-lr && git pull -q --ff-only && uv sync -q && uv run scripts/launch.py E0001 --commit abc1234
 ```
+
+- `scripts/launch.py` は commit を照合し、pueue のタスクとして登録して、すぐに戻る。
+  タスクは `sweep.py` → `collect.py` → (`--publish` を付けたら) `publish.py` → 結果の commit と push を順に行う。失敗したらそこで止まり、push しない。
+- 見る・止める:
+
+  | したいこと | コマンド |
+  |---|---|
+  | 一覧 | `pueue status` |
+  | ログを追う (Ctrl-C で見るのをやめても計算は続く) | `pueue follow <タスク番号>` |
+  | 終わったタスクのログ | `pueue log <タスク番号>` |
+  | 止める | `pueue kill <タスク番号>` |
+  | 進み具合 (ステップ数、止まっていないか) | `uv run scripts/progress.py E0001 --watch 60` |
+
+- 同じ 1 行をもう一度貼ると、終わっていない (案, seed) だけを続きから回す。
+- マシンがスリープすると止まるので、長い計算の間はスリープしない設定にする。
+- pueue の入れ方 (マシンごとに 1 回): Mac は `brew install pueue`。Linux / WSL はパッケージにあれば `sudo apt install pueue`、
+  なければ `cargo install --locked pueue` か [Releases](https://github.com/Nukesor/pueue/releases) のバイナリを PATH に置く。
+  デーモンは `pueued -d` で起動する (`launch.py` も起動を試みる)。入れたら `.okf/architecture/machines.md` に書く。
+- pueue を入れられないマシンでは、末尾に `--detach` を付けると、端末から切り離したプロセスで回す (ログは `runs/_launch/*.log`)。
+- tmux は使わない (コピペしにくく、操作を覚える必要があるため)。
 
 ## 4. 学習済みモデルの保管
 

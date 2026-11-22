@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -16,13 +17,16 @@ def git(root: Path, *args: str) -> str:
     return out.stdout.strip()
 
 
-def script(root: Path, name: str, *args: str) -> subprocess.CompletedProcess:
+def script(
+    root: Path, name: str, *args: str, env: dict[str, str] | None = None
+) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, str(ROOT / "scripts" / name), *args],
         cwd=root,
         capture_output=True,
         text=True,
         check=False,
+        env=env,
     )
 
 
@@ -113,3 +117,66 @@ def test_dev_run_is_not_collected(tmp_path: Path) -> None:
     assert r.returncode == 0, r.stderr
     assert (root / "runs" / "dev").is_dir()
     assert script(root, "collect.py", "E0001").returncode == 1
+
+
+def make_pushed_repo_with_sweep(tmp_path: Path) -> Path:
+    root = make_repo(tmp_path)
+    (root / "experiments" / "E0001-lr" / "sweep.toml").write_text(
+        'variants = ["baseline"]\nseeds = [0]\nparallel = 1\n'
+    )
+    git(root, "add", ".")
+    git(root, "commit", "-q", "-m", "sweep")
+    remote = tmp_path / "remote.git"
+    git(tmp_path, "init", "-q", "--bare", str(remote))
+    git(root, "remote", "add", "origin", str(remote))
+    git(root, "push", "-q", "-u", "origin", "main")
+    return root
+
+
+def test_launch_runs_collects_and_pushes(tmp_path: Path) -> None:
+    root = make_pushed_repo_with_sweep(tmp_path)
+    assert script(root, "launch.py", "E0001", "--commit", "0000000").returncode == 2
+    short = git(root, "rev-parse", "--short", "HEAD")
+    r = script(root, "launch.py", "E0001", "--commit", short, "--foreground")
+    assert r.returncode == 0, r.stdout + r.stderr
+    pushed = git(root, "ls-tree", "-r", "--name-only", "origin/main")
+    assert "experiments/E0001-lr/results/summary.md" in pushed
+
+
+def _fake_bin(tmp_path: Path, script_text: str | None) -> dict[str, str]:
+    """PATH の先頭に偽の pueue を置いた環境 (None なら pueue のない環境)。"""
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    if script_text is not None:
+        fake = bin_dir / "pueue"
+        fake.write_text(script_text)
+        fake.chmod(0o755)
+    path = (
+        str(bin_dir)
+        + ":"
+        + ":".join(p for p in os.environ["PATH"].split(":") if not (Path(p) / "pueue").exists())
+    )
+    return {**os.environ, "PATH": path}
+
+
+def test_launch_registers_pueue_task(tmp_path: Path) -> None:
+    root = make_pushed_repo_with_sweep(tmp_path)
+    calls = tmp_path / "calls.txt"
+    env = _fake_bin(
+        tmp_path,
+        f'#!/bin/sh\necho "$@" >> {calls}\n[ "$1" = add ] && echo 7\nexit 0\n',
+    )
+    short = git(root, "rev-parse", "--short", "HEAD")
+    r = script(root, "launch.py", "E0001", "--commit", short, env=env)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "pueue follow 7" in r.stdout
+    added = [c for c in calls.read_text().splitlines() if c.startswith("add")]
+    assert added and "--label E0001" in added[0] and "launch.py E0001" in added[0]
+
+
+def test_launch_without_pueue_explains_install(tmp_path: Path) -> None:
+    root = make_pushed_repo_with_sweep(tmp_path)
+    short = git(root, "rev-parse", "--short", "HEAD")
+    r = script(root, "launch.py", "E0001", "--commit", short, env=_fake_bin(tmp_path, None))
+    assert r.returncode == 2
+    assert "brew install pueue" in r.stdout

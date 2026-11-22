@@ -16,10 +16,25 @@ from project_name.lab import gitstate
 from project_name.lab.progress import STALE_SEC, read_progress
 
 
+def show_launches(runs_dir, experiment: str | None) -> None:
+    """scripts/launch.py で裏に回した処理の段階 (最新 5 件)。"""
+    d = runs_dir / "_launch"
+    if not d.is_dir():
+        return
+    items = [json.loads(p.read_text()) for p in sorted(d.glob("*.json"))]
+    items = [i for i in items if not experiment or i.get("experiment") == experiment][-5:]
+    for i in items:
+        print(
+            f"[launch] {i.get('experiment')}  {i.get('phase')}  {i.get('state')}  "
+            f"更新 {i.get('updated', '')}  ログ {i.get('log', '')}"
+        )
+
+
 def show(runs_dir, experiment: str | None, limit: int) -> None:
+    show_launches(runs_dir, experiment)
     rows = []
     for d in (
-        sorted(p for p in runs_dir.iterdir() if (p / "meta.json").exists())
+        sorted(p for p in runs_dir.iterdir() if (p / "meta.json").exists() and p.name != "dev")
         if runs_dir.is_dir()
         else []
     ):

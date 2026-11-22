@@ -31,6 +31,7 @@ uv run pre-commit install
 |---|---|---|
 | 評価一式の版とハッシュ | AI や人が評価を変えて数字を良く見せる | `bench/suites/`、`lab/suite.py`、テスト、`run.py`、hooks |
 | push 済みの commit からだけ実行 | 再現できない結果 | `scripts/run.py` |
+| 人間に渡すのは 1 行 (pueue のタスク) | 貼り間違い、結果の push 忘れ | `scripts/launch.py` |
 | 実行の記録 (`runs/<run_id>/meta.json`) | どの commit・seed・環境の数字か分からない | `scripts/run.py`、`collect.py` |
 | 事前登録 (予測と合格の基準) | 結果を見てからの解釈の後付け | Proposal、テスト |
 | 試して採用しなかったことの一覧 | 同じ失敗を繰り返す | `.okf/proposals/index.md` (自動生成) |
