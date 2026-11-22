@@ -180,3 +180,28 @@ def test_launch_without_pueue_explains_install(tmp_path: Path) -> None:
     r = script(root, "launch.py", "E0001", "--commit", short, env=_fake_bin(tmp_path, None))
     assert r.returncode == 2
     assert "brew install pueue" in r.stdout
+
+
+def _load_launch():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("launch", ROOT / "scripts" / "launch.py")
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_keep_awake_only_on_mac() -> None:
+    """Mac では、このプロセスの終了を待つ caffeinate を起動する。
+
+    ほかの OS と、caffeinate がないときは何もしない。
+    """
+    launch = _load_launch()
+    calls: list[list[str]] = []
+    found = {"caffeinate": "/usr/bin/caffeinate"}
+    assert launch.keep_awake("darwin", found.get, calls.append) is True
+    assert calls == [["caffeinate", "-ims", "-w", str(os.getpid())]]
+    assert launch.keep_awake("linux", found.get, calls.append) is False
+    assert launch.keep_awake("darwin", {}.get, calls.append) is False
+    assert len(calls) == 1
