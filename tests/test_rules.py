@@ -25,17 +25,19 @@ def test_rules_version_is_an_integer() -> None:
     assert rules_version(ROOT) >= 1
 
 
-def test_agents_md_matches_claude_md() -> None:
-    claude, agents = (ROOT / "CLAUDE.md").read_text(), (ROOT / "AGENTS.md").read_text()
-    assert claude == agents, "AGENTS.md は CLAUDE.md と同じ内容にする (cp CLAUDE.md AGENTS.md)"
-
-
-def test_claude_md_points_to_existing_files() -> None:
+def test_claude_md_imports_agents_md() -> None:
     text = (ROOT / "CLAUDE.md").read_text()
+    assert text.strip() == "@AGENTS.md", (
+        "CLAUDE.md は AGENTS.md を読み込む 1 行 (@AGENTS.md) だけにし、本文は AGENTS.md に書く"
+    )
+
+
+def test_agents_md_points_to_existing_files() -> None:
+    text = (ROOT / "AGENTS.md").read_text()
     paths = re.findall(r"`((?:docs|\.okf)/[^`*<>]+?)`", text)
     assert "docs/rules/ai.md" in paths
     for rel in paths:
-        assert (ROOT / rel).exists(), f"CLAUDE.md が指す {rel} がない"
+        assert (ROOT / rel).exists(), f"AGENTS.md が指す {rel} がない"
 
 
 @pytest.mark.parametrize("proposal", list_proposals(ROOT), ids=lambda p: p.stem)

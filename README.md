@@ -2,8 +2,8 @@
 
 <このプロジェクトの目的を1〜2文で>
 
-AI (Claude) が実装・実験・記録の主体となって進める、機械学習 (PyTorch) の研究用テンプレートです。
-AI への指示の入口は [CLAUDE.md](CLAUDE.md) (同じ内容の [AGENTS.md](AGENTS.md))、運用ルールは [docs/rules/](docs/rules/) にあります。
+AI エージェント (Claude Code、Codex など) が実装・実験・記録の主体となって進める、機械学習 (PyTorch) の研究用テンプレートです。
+AI への指示の入口は [AGENTS.md](AGENTS.md) (`CLAUDE.md` はこれを読み込むだけ)、運用ルールは [docs/rules/](docs/rules/) にあります。
 
 ## セットアップ
 
@@ -17,7 +17,7 @@ uv run pre-commit install
 ## 研究の流れ
 
 1. 問いを `.okf/questions/` に書き、評価一式を `bench/suites/v1/` に作る (`kind: bench` の施策)。
-2. 施策を提案する: `uv run scripts/new_experiment.py --title "..." --slug ... --kind model --question Q1 --by claude/<model>`。
+2. 施策を提案する: `uv run scripts/new_experiment.py --title "..." --slug ... --kind model --question Q1 --by <tool>/<model>`。
    Proposal (仮説・予測・合格の基準・予算) を書いて PR を作り、人間が「承認」とコメントする。
 3. 実装して回す: `uv run scripts/sweep.py experiments/E0001-*/sweep.toml` (push 済みの commit からだけ動く)。
 4. 集計して記録する: `uv run scripts/collect.py E0001`、Experiment を書く。

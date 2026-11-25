@@ -1,7 +1,7 @@
 """新しい施策をテンプレート (experiments/_template/) から作り、そのブランチに切り替える。
 
   uv run scripts/new_experiment.py --title "学習率を上げる" --slug larger-lr \
-      --kind model --question Q1 --by claude/<model>
+      --kind model --question Q1 --by <tool>/<model>
 
 作るもの:
   .okf/proposals/Exxxx-<slug>.md     提案 (承認を受けるもの)
@@ -43,7 +43,7 @@ def main() -> int:
     ap.add_argument("--question", default="-", help="Q1 など。infra は -")
     ap.add_argument("--suite", help="評価一式の版。省略すると最新の版 (infra は -)")
     ap.add_argument(
-        "--by", required=True, help="書き手 (claude/<model> か human:<id>)。OKF の generated.by"
+        "--by", required=True, help="書き手 (<tool>/<model> か human:<id>)。OKF の generated.by"
     )
     ap.add_argument("--no-branch", action="store_true", help="ブランチを作らない")
     args = ap.parse_args()

@@ -31,7 +31,7 @@ def main() -> int:
 
     print("# 今どこにいるか (SessionStart hook が自動で表示)")
     print()
-    print(f"- ルール v{version}。作業の前に CLAUDE.md に書かれた順に読む")
+    print(f"- ルール v{version}。作業の前に AGENTS.md に書かれた順に読む")
     print(
         f"- ブランチ {branch} / commit {commit} / 未コミットの変更: {'あり' if dirty else 'なし'}"
     )

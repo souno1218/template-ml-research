@@ -1,5 +1,9 @@
 # 知識ベースの履歴
 
+## 2026-11-25
+
+* **Decision**: [AI への指示の本文を AGENTS.md に書き、CLAUDE.md はそれを読み込むだけにする](decisions/agents-md-as-entry.md)。ルールを v3 にした。
+
 ## 2026-11-22
 
 * **Decision**: [長い計算は pueue で回し、人間に渡すのは 1 行にする](decisions/run-long-jobs-with-pueue.md)。tmux をやめ、ルールを v2 にした。

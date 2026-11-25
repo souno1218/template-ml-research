@@ -20,7 +20,7 @@
 ## 書き方
 
 - 1 ファイル 1 コンセプト。frontmatter に非空の `type` を必ず書く。
-- `generated: { by: "claude/<model>", at: "<UTC の日時>" }` を自分の名義で書く。意味が変わらない整形では更新しない。
+- `generated: { by: "<tool>/<model>", at: "<UTC の日時>" }` を自分の名義で書く (例: `claude/<model>`、`codex/<model>`)。意味が変わらない整形では更新しない。
 - 出典のない事実は書かない。`sources` に出典を書き、主張には脚注 (ラベルは `sources[].id`) を付ける。
   実験の数字の出典は `experiments/Exxxx-*/results/summary.md` (バンドルの外なので、ファイルからの相対パスで書く)。
 - `verified` は、人間が確認して自分の id (`human:<id>`) を明示したときだけ追記する。推測で付けない。

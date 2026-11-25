@@ -1,6 +1,6 @@
 # AI の作業の入口
 
-このリポジトリは、AI (Claude) が実装・実験・記録の主体となって進める、機械学習 (PyTorch) の研究用のリポジトリです。
+このリポジトリは、AI エージェント (Claude Code、Codex など) が実装・実験・記録の主体となって進める、機械学習 (PyTorch) の研究用のリポジトリです。
 **作業を始める前に、必ず次の順に読んでください。**
 
 1. このファイル
@@ -24,6 +24,7 @@
 5. **main に直接 push しない。** main に入るのは、人間がマージした Pull Request だけ。人間の承認は「施策の開始」と「採用の判定」の 2 か所。
 
 3〜5 の一部は `.claude/settings.json` の hooks が機械で止める。止められたら、迂回せずに理由を読み、施策を分けるか人間に頼む。
+この hooks が効くのは Claude Code だけ。ほかのツールでは止めてくれないので、上のルールを自分で守る (pre-commit・CI・`scripts/run.py` の検査は、どのツールでも効く)。
 
 ## よく使うコマンド
 
@@ -31,8 +32,10 @@
 uv run pytest                     # テスト (ルールの検査を含む)
 uv run ruff check . && uv run ruff format --check . && uv run ty check
 uv run python tools/okf/validate.py .okf --strict
-uv run scripts/new_experiment.py --title "..." --slug ... --kind model --question Q1 --by claude/<model>
+uv run scripts/new_experiment.py --title "..." --slug ... --kind model --question Q1 --by <tool>/<model>
 uv run scripts/index.py           # .okf/*/index.md を作り直す
 ```
 
 最初に `pyproject.toml` の `name`、`src/project_name/` の名前、README の題を、プロジェクト名に合わせて直す。
+
+本文はこのファイル (`AGENTS.md`) だけに書く。`CLAUDE.md` は Claude Code がこのファイルを読み込むための 1 行だけにする。
