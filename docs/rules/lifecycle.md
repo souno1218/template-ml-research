@@ -17,7 +17,7 @@
 
 ```bash
 uv run scripts/new_experiment.py --title "学習率を上げる" --slug larger-lr \
-    --kind model --question Q1 --by claude/<model>
+    --kind model --question Q1 --by <tool>/<model>
 ```
 
 ブランチ `exp/E0001-larger-lr` に切り替わり、上の 3 つ (Decision 以外) がテンプレートから作られる。
